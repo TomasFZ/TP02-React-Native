@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import ConfiguracionNumEmergencia from './src/views/ConfiguracionNumEmergencia';
 import ContactList from './src/views/Contactos';
 import EmergencyScreen from './src/views/LlamadoEmergencia';
+import WeatherAndTime from './src/views/Temperatura';
 
 const Stack = createStackNavigator();
 
@@ -18,6 +19,7 @@ export default function App() {
         <Stack.Screen name="ConfiguracionNumeroEmergencia" component={ConfiguracionNumEmergencia} />
         <Stack.Screen name="Contactos" component={ContactList} />
         <Stack.Screen name="LlamadoEmergencia" component={EmergencyScreen} />
+        <Stack.Screen name="Temperatura" component={WeatherAndTime} />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>

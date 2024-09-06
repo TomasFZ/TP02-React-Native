@@ -5,6 +5,7 @@ const links = [
   { id: '1', title: 'Configuración de Nro. Emergencia', route: 'ConfiguracionNumeroEmergencia' },
   { id: '2', title: 'Contactos', route: 'Contactos' },
   { id: '3', title: 'Llamado de emergencia', route: 'LlamadoEmergencia' },
+  { id: '4', title: 'Hora actual / Temperatura', route: 'Temperatura' },
   // Puedes agregar más enlaces aquí
 ];
 
