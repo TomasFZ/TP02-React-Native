@@ -1,74 +1,51 @@
-import React, { useState } from 'react';
-import { TextInput, View, Button, FlatList, StyleSheet } from 'react-native';
-import ToDo from '../../components/ToDo';
+import React from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 
-export default function Main() {
-    const [toDoList, setToDoList] = useState([]);
-    const [newTask, setNewTask] = useState('');
+const links = [
+  { id: '1', title: 'Configuración de Nro. Emergencia', route: 'ConfiguracionNumeroEmergencia' },
+  { id: '2', title: 'Contactos', route: 'Contactos' },
+  { id: '3', title: 'Llamado de emergencia', route: 'LlamadoEmergencia' },
+  // Puedes agregar más enlaces aquí
+];
 
-    const addToDo = () => {
-        if (newTask.trim() === '') return;
+const Main = ({ navigation }) => {
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() => navigation.navigate(item.route)}
+    >
+      <Text style={styles.text}>{item.title}</Text>
+    </TouchableOpacity>
+  );
 
-        const newTaskItem = { id: Date.now().toString(), task: newTask };
-
-        setToDoList((prevToDoList) => [...prevToDoList, newTaskItem]);
-        setNewTask('');
-    }
-
-    const deleteToDo = (id) => {
-        setToDoList((prevToDoList) => prevToDoList.filter((todo) => todo.id !== id));
-    };
-
-    return (
-        <View style={styles.container}>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder="Ingrese una tarea"
-                    value={newTask}
-                    onChangeText={(text) => setNewTask(text)}
-                    style={styles.textInput}
-                />
-                <Button title="Añadir" onPress={addToDo} color="#007BFF" />
-            </View>
-            <View style={styles.listContainer}>
-                <FlatList
-                    data={toDoList}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => <ToDo id={item.id} task={item.task} deleteToDo={deleteToDo} />}
-                />
-            </View>
-        </View>
-    );
-}
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={links}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        width: '90%',
-        maxWidth: 500,
-        padding: 20,
-        backgroundColor: '#f5f5f5',
-        borderRadius: 10,
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-    },
-    inputContainer: {
-        marginBottom: 20, // Espacio entre el input y la lista
-    },
-    textInput: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
-        paddingHorizontal: 10,
-        marginBottom: 10,
-        backgroundColor: '#fff',
-    },
-    listContainer: {
-        flex: 1,
-        marginTop: 20, // Espacio adicional en la parte superior de la lista de tareas
-    },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  item: {
+    padding: 15,
+    marginVertical: 5,
+    backgroundColor: '#DDDDDD',
+    borderRadius: 5,
+  },
+  text: {
+    fontSize: 18,
+  },
 });
+
+export default Main;
+
+
+
