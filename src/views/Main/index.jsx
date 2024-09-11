@@ -7,7 +7,7 @@ const links = [
   { id: '3', title: 'Llamado de emergencia', route: 'LlamadoEmergencia' },
   { id: '4', title: 'Hora actual / Temperatura', route: 'Temperatura' },
   { id: '5', title: 'About', route: 'About' },
-  // Puedes agregar más enlaces aquí
+  
 ];
 
 const Main = ({ navigation }) => {
