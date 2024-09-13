@@ -1,39 +1,103 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, LogBox } from 'react-native';
+import PhoneInput from 'react-native-phone-number-input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ConfiguracionNumEmergencia = () => {
-  const [emergencyNumber, setEmergencyNumber] = useState('');
+  const phoneInput = useRef(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [formattedValue, setFormattedValue] = useState('');
+  const [valid, setValid] = useState(false);
+  const [countryCode, setCountryCode] = useState('AR'); // Argentina como predeterminado
 
+  // Cargar el número de emergencia guardado
+  useEffect(() => {
+    const loadEmergencyNumber = async () => {
+      try {
+        const storedNumber = await AsyncStorage.getItem('emergencyNumber');
+        if (storedNumber) {
+          setPhoneNumber(storedNumber);
+          setFormattedValue(storedNumber);
+        }
+      } catch (error) {
+        console.error('Error al cargar el número de emergencia:', error);
+      }
+    };
+
+    loadEmergencyNumber();
+  }, []);
+
+  // Guardar el número de teléfono en AsyncStorage
   const saveEmergencyNumber = async () => {
-    if (emergencyNumber.match(/^\d{10,}$/)) {
-      await AsyncStorage.setItem('emergencyNumber', emergencyNumber);
-      Alert.alert('Guardado', 'Número de emergencia guardado con éxito');
+    const checkValid = phoneInput.current?.isValidNumber(formattedValue); // Valida el número usando el input
+    setValid(checkValid);
+
+    if (checkValid) {
+      try {
+        await AsyncStorage.setItem('emergencyNumber', formattedValue);
+        Alert.alert('Guardado', 'Número de emergencia guardado con éxito');
+        console.log('Número de teléfono guardado:', formattedValue); // Muestra en log
+      } catch (error) {
+        Alert.alert('Error', 'No se pudo guardar el número de emergencia');
+      }
     } else {
       Alert.alert('Error', 'Por favor ingresa un número de teléfono válido');
     }
   };
 
   return (
-    <View>
-      <Text>Configura tu número de emergencia:</Text>
-      <TextInput
-        placeholder="Ingresa el número de emergencia"
-        keyboardType="phone-pad"
-        value={emergencyNumber}
-        onChangeText={setEmergencyNumber}
+    <View style={styles.container}>
+      <Text style={styles.title}>Configura tu número de emergencia:</Text>
+      
+      <PhoneInput
+        ref={phoneInput}
+        defaultValue={phoneNumber}
+        defaultCode={countryCode}
+        layout="first"
+        onChangeFormattedText={(text) => {
+          setFormattedValue(text);
+        }}
+        onChangeText={(text) => setPhoneNumber(text)}
+        onChangeCountry={(country) => setCountryCode(country.cca2)}
+        withShadow
+        autoFocus
+        countryPickerProps={{ withAlphaFilter: true }}
+        withDarkTheme
       />
-      <Button title="Guardar" onPress={saveEmergencyNumber} />
+
+      <TouchableOpacity style={styles.button} onPress={saveEmergencyNumber}>
+        <Text style={styles.buttonText}>Guardar Número</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+  },
+  title: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
+
 export default ConfiguracionNumEmergencia;
-
-
-
-
-
 
 /*import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
