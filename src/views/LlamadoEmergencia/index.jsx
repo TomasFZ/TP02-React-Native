@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Alert, StyleSheet, Linking } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EmergencyScreen = () => {
   const [isShakeDetected, setShakeDetected] = useState(false);
-  const [emergencyNumber, setEmergencyNumber] = useState('5491123456789'); // Número de emergencia configurado
+  const [emergencyNumber, setEmergencyNumber] = useState('5491123456789'); // Número de emergencia predeterminado
 
-  // Umbral para detectar sacudidas rápidas
   const SHAKE_THRESHOLD = 1.5;
 
   useEffect(() => {
-    // Subscribirse al acelerómetro
-    Accelerometer.setUpdateInterval(500); // Intervalo de actualización en milisegundos
+    const fetchEmergencyNumber = async () => {
+      const number = await AsyncStorage.getItem('emergencyNumber');
+      if (number) {
+        setEmergencyNumber(number);
+      }
+    };
+
+    fetchEmergencyNumber();
+
+    Accelerometer.setUpdateInterval(500);
     const subscription = Accelerometer.addListener((accelerometerData) => {
       handleShake(accelerometerData);
     });
 
-    return () => subscription.remove(); // Eliminar suscripción cuando el componente se desmonta
+    return () => subscription.remove();
   }, []);
 
   const handleShake = (data) => {
@@ -26,14 +34,12 @@ const EmergencyScreen = () => {
     if (magnitude > SHAKE_THRESHOLD && !isShakeDetected) {
       setShakeDetected(true);
       sendEmergencyMessage();
-      // Para evitar detectar múltiples sacudidas rápidamente
       setTimeout(() => {
         setShakeDetected(false);
-      }, 2000); // Tiempo de espera antes de permitir otra detección
+      }, 2000);
     }
   };
 
-  // Enviar un SMS de emergencia
   const sendSMS = () => {
     const message = '¡Emergencia! Necesito ayuda.';
     Linking.openURL(`sms:${emergencyNumber}?body=${message}`)
@@ -46,7 +52,6 @@ const EmergencyScreen = () => {
       });
   };
 
-  // Enviar un mensaje por WhatsApp
   const sendWhatsAppMessage = () => {
     const message = '¡Emergencia! Necesito ayuda.';
     const url = `whatsapp://send?phone=${emergencyNumber}&text=${message}`;
@@ -61,7 +66,6 @@ const EmergencyScreen = () => {
       });
   };
 
-  // Función que decide si enviar por SMS o WhatsApp
   const sendEmergencyMessage = () => {
     Alert.alert(
       'Enviar Mensaje de Emergencia',

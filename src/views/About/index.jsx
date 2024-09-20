@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, Modal, StyleSheet } from 'react-native';
-import QRCode from 'react-native-qrcode-svg'; // Correcta importación
-import * as BarCodeScanner from 'expo-barcode-scanner'; // Correcta importación
+import QRCode from 'react-native-qrcode-svg';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 const About = () => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -10,16 +10,13 @@ const About = () => {
 
   const handleBarCodeScanned = ({ data }) => {
     setScannedData(data);
-    setModalVisible(false); // Close the scanner after a successful scan
-  };
-
-  const requestPermissions = async () => {
-    const { status } = await BarCodeScanner.requestPermissionsAsync();
-    setHasPermission(status === 'granted');
   };
 
   useEffect(() => {
-    requestPermissions();
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
   }, []);
 
   if (hasPermission === null) {
@@ -41,30 +38,32 @@ const About = () => {
       />
       <Button title="Scan QR Code" onPress={() => setModalVisible(true)} />
       
-      {modalVisible && (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}>
-          <View style={styles.modalView}>
-            <BarCodeScanner
-              onBarCodeScanned={scannedData ? undefined : handleBarCodeScanned}
-              style={StyleSheet.absoluteFillObject}
-            />
-            <View style={styles.infoContainer}>
-              {scannedData ? (
-                <Text style={styles.scannedText}>Scanned Data: {scannedData}</Text>
-              ) : (
-                <Text style={styles.instructions}>Scan a QR code</Text>
-              )}
-              <Button title="Close" onPress={() => setModalVisible(false)} />
-            </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <BarCodeScanner
+            onBarCodeScanned={handleBarCodeScanned}
+            style={StyleSheet.absoluteFillObject}
+          />
+          <View style={styles.infoContainer}>
+            {scannedData ? (
+              <Text style={styles.scannedText}>
+              {scannedData ? `Scanned Data: ${scannedData}` : 'Scan a QR code'}
+              </Text>
+            ) : (
+              <Text style={styles.instructions}>Scan a QR code</Text>
+            )}
+            <Button title="Close" onPress={() => {
+              setModalVisible(false);
+              setScannedData('');
+            }} />
           </View>
-        </Modal>
-      )}
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -91,12 +90,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   infoContainer: {
+    width: '80%',
+    position: 'absolute',
+    bottom: 20,
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
   },
   scannedText: {
+    textAlign: 'center',
     fontSize: 18,
     marginBottom: 16,
   },

@@ -1,2 +1,8 @@
-implementation project(':react-native-contacts')
-implementation project(':react-native-permissions')
+dependencies {
+    // Otros proyectos
+    implementation project(':react-native-contacts')
+    implementation project(':react-native-permissions')
+
+    // Agregar react-native-vision-camera
+    implementation 'com.google.android.gms:play-services-vision:20.0.0'
+}

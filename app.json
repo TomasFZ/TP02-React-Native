@@ -22,7 +22,9 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["READ_CONTACTS"]
+      "permissions": ["READ_CONTACTS", 
+        "CAMERA",
+        "MEDIA_LIBRARY"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
